@@ -9,19 +9,18 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
 
     public Handler mHandler;
-    public boolean FLAG = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        List<Channel> chanels = new ArrayList<>();
-
+        CopyOnWriteArrayList<Channel> chanels = new CopyOnWriteArrayList<>();
         for (int i = 0; i < 100; i++) {
             chanels.add(new Channel(i, "Title: " + i, "desc: " + i, "image url: " + i));
         }
@@ -74,9 +73,11 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void run() {
-            FLAG = false;
             Channel chanel = new Channel(data.size(), "Title: " + data.size(), "desc: " + data.size(), "image url: " + data.size());
-            data.add(chanel);
+            for (int i = 0; i < data.size(); i++) {
+                data.add(chanel);
+            }
+
             Log.d("Write chanel: ", chanel.getId() + chanel.getTitle() + chanel.getDesc() + chanel.getImageUrl());
             handler.postDelayed(this, 9000);
         }
@@ -97,7 +98,6 @@ public class MainActivity extends ActionBarActivity {
             for (int i = 0; i < data.size(); i++) {
                 data.set(i, new Channel(i, "New Title: " + i, "New desc: " + i, "New image url: " + i) );
             }
-            FLAG = true;
             Log.d("Update chanel: ", "true");
             handler.postDelayed(this, 15000);
         }
@@ -111,15 +111,16 @@ public class MainActivity extends ActionBarActivity {
         public ReaderThread(List<Channel> data){
             handler = new Handler();
             this.data = data;
-            
+
         }
 
         @Override
         public void run() {
-            if (FLAG) {
-                Log.d("Read chanel: ", data.get(data.size() - 1).getId() + data.get(data.size() - 1).getTitle() + data.get(data.size() - 1).getDesc() + data.get(data.size() - 1).getImageUrl());
+            for (int i = 0; i < data.size(); i++) {
+                Log.d("Read chanel: ", data.get(i).getId() + data.get(i).getTitle() + data.get(i).getDesc() + data.get(i).getImageUrl());
+
             }
-            handler.postDelayed(this, 12000);
+             handler.postDelayed(this, 12000);
         }
     }
 
